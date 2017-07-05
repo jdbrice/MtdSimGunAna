@@ -1,0 +1,42 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+	<ClassName>
+		TH1D
+	</ClassName>
+	<Data name="h" url="mc_info.root"/>
+	<OptStats x1="0.1" x2="0.2" y1="0.11" y2="0.01"/>
+	<PlotTemplate names="TH1:*">
+		<Export url="Export/mc_h_geantPID_secondary_parent.pdf"/>
+		<Histo name="h/geantPID_secondary_parent" style="style.TH1D"/>
+	</PlotTemplate>
+	<PlotTemplate names="TH1:geantPID*">
+		<Export url="Export/mc_h_geantPID_secondary_parent.pdf"/>
+		<Histo name="h/geantPID_secondary_parent" style="style.TH1D"/>
+		<Margins>
+			0.01, 0.025, 0.2, 0.1
+		</Margins>
+	</PlotTemplate>
+	<ext>
+		pdf
+	</ext>
+	<iPlot>
+		21
+	</iPlot>
+	<jobIndex>
+		-1
+	</jobIndex>
+	<mod>
+		mc
+	</mod>
+	<name>
+		h/geantPID_secondary_parent
+	</name>
+	<style>
+		<TH1D draw="" fca="#0000FF, 0.3" linewidth="1" logy="1" min="0.1" optstat="10" xto="1.1" xts="0.04" yto="1.1" yts="0.04"/>
+	</style>
+	<uname>
+		h_geantPID_secondary_parent
+	</uname>
+</config>

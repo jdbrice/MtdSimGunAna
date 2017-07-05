@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Task name="FemtoDstSkimmer" type="FemtoDstSkimmer" config="" nodePath="FDS" />
+
+	<mod>PID_</mod>
+	<FDS>
+		<EventLoop progress="true" />
+		<input>
+			<dst treeName="FemtoDst" url="./list.lis" splitBy="10" maxFiles="-1"/>
+		</input>
+
+		<output>
+			<TFile url="out/data_SL15c.root" />
+		</output>
+
+		<histograms>
+			<Histo name="Events" title="# of Events" bins_x="bins.n" />
+			<Histo name="McIndex" title="Track Associated McIndex" bins_x="bins.n" />
+			<Histo name="PtResolution" title="Resolution; (p^{RC}_{T} - p^{MC}_{T} ) / p^{MC}_{T}" bins_x="bins.pt_res" />
+			<Histo name="PtResolutionVsPt" title="Resolution; p_{T} (GeV/c); (p^{RC}_{T} - p^{MC}_{T} ) / p^{MC}_{T}" bins_x="bins.pt" bins_y="bins.pt_res" />
+
+			<Histo name="pip_mDeltaY_mBL" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mBL" />
+			<Histo name="pim_mDeltaY_mBL" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mBL" />
+
+			<Histo name="pip_mDeltaY_mCell" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mCell" />
+			<Histo name="pim_mDeltaY_mCell" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mCell" />
+
+			<Histo name="pip_mDeltaY_mMod" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mMod" />
+			<Histo name="pim_mDeltaY_mMod" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mMod" />
+
+			<Histo name="pip_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+			<Histo name="pim_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+
+			<Histo name="punch_pip_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+			<Histo name="punch_pim_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+
+			<Histo name="sec_mup_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+			<Histo name="sec_mum_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+
+			<Histo name="idTruthVsIndex" title="" bins_x="bins.idTruth" />
+
+			<Histo name="mtdMatchFlag" title="MTD matchFlag" bins_x="bins.mBL" />
+		</histograms>
+
+	</FDS>
+
+
+	<bins>
+		<GeantBins type="l">, GAMMA, e+, e-, NEUTRINO, mu+, mu-, pi0 , pi+, pi-, KAON 0 LONG, KAON +, KAON -, NEUTRON, PROTON, ANTIPROTON, KAON 0 SHORT, ETA, LAMBDA, SIGMA +, SIGMA 0, SIGMA -, XI 0, XI -, OMEGA -, ANTINEUTRON, ANTILAMBDA, ANTISIGMA -, ANTISIGMA 0, ANTISIGMA +, ANTIXI 0, ANTIXI +, ANTIOMEGA +, , , , , , , , , , , , , DEUTERON, TRITON, ALPHA, GEANTINO, HE3, Cerenkov</GeantBins>
+		<GeantBinsText type="l">, GAMMA, POSITRON, ELECTRON, NEUTRINO, MUON +, MUON -, PION 0 , PION +, PION -, KAON 0 LONG, KAON +, KAON -, NEUTRON, PROTON, ANTIPROTON, KAON 0 SHORT, ETA, LAMBDA, SIGMA +, SIGMA 0, SIGMA -, XI 0, XI -, OMEGA -, ANTINEUTRON, ANTILAMBDA, ANTISIGMA -, ANTISIGMA 0, ANTISIGMA +, ANTIXI 0, ANTIXI +, ANTIOMEGA +, , , , , , , , , , , , , DEUTERON, TRITON, ALPHA, GEANTINO, HE3, Cerenkov</GeantBinsText>
+		<n width="1" min="0" max="100" />
+		<pt_res width="0.001" min="-1" max="1.0" />
+		<pt width="0.05" min="0" max="8" />
+		<mDeltaY width="0.5" min="-65" max="65" />
+		<idTruth width="1" min="-100" max="100" />
+		<mBL width="1" min="0" max="31" />
+		<mCell width="1" min="0" max="12" />
+		<mMod width="1" min="0" max="30" />
+	</bins>
+
+</config>

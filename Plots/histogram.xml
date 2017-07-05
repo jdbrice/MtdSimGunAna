@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Data name="d" treeName="FemtoDst" url="list_979F0A3.lis" maxFiles="-1" />
+	<TCanvas width="1000" height="700" />
+	<TFile url="histogram_{plc}.root" />
+
+	<plc>8</plc>
+
+	<Transform states="Pt, Eta, Phi">
+		
+		<Draw save_as="primary_{plc}_Mc{state}"  name="primary_{plc}_Mc{state}" data="d" draw="McTracks.m{state}" select="McTracks.mGeantPID == {plc} && McTracks.mParentIndex < 0" bins_x="bins.m{state}" />
+
+		<Draw save_as="primary_{plc}_Rc{state}"  name="primary_{plc}_Rc{state}" data="d" draw="McTracks[Tracks.mMcIndex].m{state}" select="Tracks.mMtdPidTraitsIndex >= -1 && Tracks.mMcIndex >= 0 && McTracks[ Tracks.mMcIndex  ].mGeantPID == {plc} && McTracks[ Tracks.mMcIndex  ].mParentIndex < 0" bins_x="bins.m{state}" />
+		
+		<Draw save_as="primary_{plc}_Mtd{state}" name="primary_{plc}_Mtd{state}" data="d" draw="McTracks[Tracks.mMcIndex].m{state}" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex >= 0 && McTracks[ Tracks.mMcIndex  ].mGeantPID == {plc} && McTracks[ Tracks.mMcIndex  ].mParentIndex < 0" bins_x="bins.m{state}" />
+
+	</Transform>
+		<Draw save_as="primary_{plc}_McPtvsEta"  name="primary_{plc}_RcPtvsEta" data="d" draw="McTracks.mPt : McTracks.mEta" select="McTracks.mGeantPID == {plc} && McTracks.mParentIndex < 0" bins_x="bins.mEta" bins_y="bins.mPt" />
+
+		<Draw save_as="primary_{plc}_RcPtvsEta"  name="primary_{plc}_RcPtvsEta" data="d" draw="McTracks[Tracks.mMcIndex].mPt : McTracks[Tracks.mMcIndex].mEta" select="Tracks.mMtdPidTraitsIndex >= -1 && Tracks.mMcIndex >= 0 && McTracks[ Tracks.mMcIndex  ].mGeantPID == {plc} && McTracks[ Tracks.mMcIndex  ].mParentIndex < 0" bins_x="bins.mEta" bins_y="bins.mPt" />
+
+		<Draw save_as="primary_{plc}_MtdPtvsEta"  name="primary_{plc}_RcPtvsEta" data="d" draw="McTracks[Tracks.mMcIndex].mPt : McTracks[Tracks.mMcIndex].mEta" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex >= 0 && McTracks[ Tracks.mMcIndex  ].mGeantPID == {plc} && McTracks[ Tracks.mMcIndex  ].mParentIndex < 0" bins_x="bins.mEta" bins_y="bins.mPt" />
+
+	<Transform>
+	</Transform>
+
+	<bins>
+		<mPhi width="0.01" min="-4" max="4" />
+		<mEta width="0.01" min="-2" max="2" />
+		<mPt  width="0.050" min="0" max="15" />
+		
+	</bins>
+
+</config>

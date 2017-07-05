@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Data name="d" treeName="FemtoDst" url="list_idTruth.lis" maxFiles="-1" />
+	<TCanvas width="1000" height="700" />
+	<TFile url="mc_info.root" />
+
+	<state_name>
+		@bins.GeantNames.Name[{state}]
+	</state_name>
+
+	<pID>McTracks.mParentIndex</pID>
+	<gpID>McTracks[McTracks.mParentIndex].mParentIndex</gpID>
+
+	<vars>
+		<mPt> p_{T} </mPt>
+		<mEta> #eta </mEta>
+		<mPhi> #phi </mPhi>
+	</vars>
+	<units>
+		<mPt>(GeV/c)</mPt>
+	</units>
+	<var> @vars.{name} </var>
+	<unit> @units.{name} </unit>
+
+	<Transform states="">
+		<Draw data="d" name="geantPID" draw="McTracks.mGeantPID" bins_x="bins.GeantBins" />
+		<Draw data="d" name="geantPID_primary" draw="McTracks.mGeantPID" select="McTracks.mParentIndex == -1" bins_x="bins.GeantBins" />
+		<Draw data="d" name="geantPID_secondary" draw="McTracks.mGeantPID" select="McTracks.mParentIndex > -1" bins_x="bins.GeantBins" />
+		<Draw data="d" name="parentIndex" draw="McTracks.mParentIndex" bins_x="bins.mIndex" />
+		<Draw data="d" name="geantPID_secondary_parent" draw="McTracks[McTracks.mParentIndex].mGeantPID" select="McTracks.mParentIndex >= 0" bins_x="bins.GeantBins" />
+
+		<Draw data="d" name="geantPID_children_of_primary" draw="McTracks.mGeantPID" select="{pID}>-1 && McTracks[{pID}]==-1" bins_x="bins.GeantBins" />
+		<Draw data="d" name="geantPID_gchildren_of_primary" draw="McTracks.mGeantPID" select="{pID}>-1 && {gpID}>-1 && McTracks[{gpID}].mParentIndex==-1" bins_x="bins.GeantBins" />
+	</Transform>
+
+	<Transform states="mPt, mEta, mPhi" >
+		<Draw data="d" name="primary_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex==-1" bins_x="bins.{state}" />
+		<Draw data="d" name="secondary_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex>-1" bins_x="bins.{state}" />
+
+		<Draw data="d" name="primary_5_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex==-1 && McTracks.mGeantPID == 5" bins_x="bins.{state}" />
+		<Draw data="d" name="primary_6_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex==-1 && McTracks.mGeantPID == 6" bins_x="bins.{state}" />
+
+		<Draw data="d" name="primary_8_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex==-1 && McTracks.mGeantPID == 8" bins_x="bins.{state}" />
+		<Draw data="d" name="primary_9_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex==-1 && McTracks.mGeantPID == 9" bins_x="bins.{state}" />
+
+		<Draw data="d" name="secondary_6_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex>-1 && McTracks.mGeantPID == 6" bins_x="bins.{state}" />
+		<Draw data="d" name="secondary_5_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex>-1 && McTracks.mGeantPID == 5" bins_x="bins.{state}" />
+
+		<Draw data="d" name="secondary_8_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex>-1 && McTracks.mGeantPID == 8" bins_x="bins.{state}" />
+		<Draw data="d" name="secondary_9_{state}" draw="McTracks.{state}" select="McTracks.mParentIndex>-1 && McTracks.mGeantPID == 9" bins_x="bins.{state}" />
+
+	</Transform>
+
+	<Transform states="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15" >
+		<Draw data="d" name="geantPID_secondary_{state}_parent" draw="McTracks[McTracks.mParentIndex].mGeantPID" select="McTracks.mParentIndex >= 0 && McTracks.mGeantPID == {state}" bins_x="bins.GeantBins"/>
+	</Transform>
+	<h_name>@bins.GeantNames.Name[{iPlot}]</h_name>
+	<PlotTemplate names="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15" >
+		<Histo name="geantPID_secondary_{iPlot}_parent">
+			<style title="Parents of {h_name}" />
+		</Histo>
+	</PlotTemplate>
+
+	<Plot>
+		<Histo name="geantPID"> <style title="All MC Particles" /> </Histo>
+		<Histo name="geantPID_primary"> <style title="Primary MC Particles" /> </Histo>
+		<Histo name="geantPID_secondary"> <style title="Secondary MC Particles" /> </Histo>
+		<Histo name="geantPID_secondary_parent" > <style title="Parents of secondary plcs" /> </Histo>
+		<Histo name="parentIndex" > <style title="MC Parent Index" /> </Histo>
+		<Histo name="geantPID_children_of_primary" > <style title="Direct Children of Primary" /> </Histo>
+		<Histo name="geantPID_gchildren_of_primary" > <style title="Direct Grandchildren of Primary" /> </Histo>
+	</Plot>
+
+
+	<PlotTemplate names="mPt, mEta, mPhi">
+		<Histo name="primary_{name}"> <style title="Primary MC Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+		<Histo name="secondary_{name}"> <style title="Secondary MC Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+
+		<Histo name="primary_5_{name}"> <style title="Primary MC #mu^{+} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+		<Histo name="primary_6_{name}"> <style title="Primary MC #mu^{-} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+
+		<Histo name="secondary_5_{name}"> <style title="Secondary MC #mu^{+} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+		<Histo name="secondary_6_{name}"> <style title="Secondary MC #mu^{-} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+
+		<Histo name="primary_8_{name}"> <style title="Primary MC #pi^{+} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+		<Histo name="primary_9_{name}"> <style title="Primary MC #pi^{-} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+
+		<Histo name="secondary_8_{name}"> <style title="Secondary MC #pi^{+} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+		<Histo name="secondary_9_{name}"> <style title="Secondary MC #pi^{-} Tracks" x="{var} {unit}" y="dN/d{var}" /> </Histo>
+	</PlotTemplate>
+
+	<bins>
+		<Include url="./GeantNames.xml" />
+		<mIndex width="1" min="-1" max="200" />
+
+		<mPt width="0.050" min="0" max="15.0" />
+		<mEta width="0.05" min="-2" max="2.0" />
+		<mPhi width="0.05" min="-3.2" max="3.2" />
+	</bins>
+</config>

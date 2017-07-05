@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<Logger globalLogLevel="info" url="debug.log"/>
+
+	<list>list.lis</list>
+	<Data name="d" treeName="FemtoDst" url="{list}" maxFiles="-1" />
+	<TFile url="mtd_gpid_{plc}.root" />
+
+	<TCanvas width="1000" height="700" />
+	
+	<cutBL select="( (mMtdHitChan/60) < 7.0 || (mMtdHitChan/60) >= 24 || ( (mMtdHitChan/60)>=8.0 && (mMtdHitChan/60)<23.0 ) )" />
+	<plc>8</plc>
+	<id>MtdPidTraits[Tracks.mMtdPidTraitsIndex].mIdTruth</id>
+	<iMtd>Tracks.mMtdPidTraitsIndex</iMtd>
+	<iTMC>MtdPidTraits[{iMtd}].mIdTruth-1</iTMC	>
+	<iMC>Tracks.mMcIndex</iMC>
+
+	<!-- <Include url="MomentumResolution.xml" /> -->
+	<!-- <Transform>
+		<Draw name="d/mtd_{plc}_Cell_vs_BL" draw="mMtdHitChan - TMath::Floor(mMtdHitChan/60)*60 :TMath::Floor( mMtdHitChan / 60 )" select="{cutBL:select}" bins_x="bins.mBL" bins_y="bins.mStrip" />
+
+		<Draw name="d/mtd_{plc}_mMtdPidTraitsIndex" draw="Tracks.mMtdPidTraitsIndex" bins_x="bins.index" />
+		<Draw name="d/mtd_{plc}_mMcIndex" draw="Tracks.mMcIndex" bins_x="bins.index" />
+		<Draw name="d/mtd_{plc}_assoc_mMtdPidTraitsIndex" draw="Tracks.mMtdPidTraitsIndex" select="Tracks.mMcIndex>=0" bins_x="bins.index" />
+
+		<Draw name="d/geant_pid" draw="McTracks.mGeantPID" bins_x="bins.mGeantPID" />
+		<Draw name="d/parent_index" draw="McTracks.mParentIndex" bins_x="mParentIndex" />
+		<Draw name="d/geant_pid_wParent" draw="McTracks.mGeantPID" select="McTracks.mParentIndex>=0" bins_x="mGeantPID" />
+	</Transform> -->
+
+	<Transform states="DeltaY">
+
+		<!-- <Draw save_as="mtd_{state}" data="d" name="mtd_{state}" draw="MtdPidTraits.m{state}" select="Tracks.mMcIndex >= 0" bins_x="bins.m{state}" /> -->
+		
+		<!-- <Draw save_as="mtd_{plc}_BL" data="d" name="mtd_{plc}_BL" draw="MtdPidTraits.mMtdHitChan/60" bins_x="bins.mBL" /> -->
+		<!-- <Draw save_as="mtd_{plc}_Strip" data="d" name="mtd_{plc}_Strip" draw="MtdPidTraits.mMtdHitChan % 12" bins_x="bins.mStrip" /> -->
+		
+		<!-- <Draw data="d" name="mtd_{plc}_{state}_vs_pT" draw="MtdPidTraits.m{state} : McTracks[{id}].mPt" select="McTracks[{id}].mGeantPID == {plc} && {id} >=0 && {id} < @McTracks.size()" bins_y="bins.m{state}" bins_x="bins.mPt" /> -->
+
+		<!-- <Draw data="d" name="mtd_{plc}_{state}_vs_pT" draw="McTracks[McTracks[{id}].mParentIndex].mPt" select="McTracks[{id}].mParentIndex >= 0 &&  McTracks[McTracks[{id}].mParentIndex].mGeantPID==8 && McTracks[McTracks[{id}].mParentIndex].mParentIndex==-1" /> -->
+
+		<!-- <Draw data="d" name="mtd_{plc}_{state}_vs_pT" draw="MtdPidTraits.mDeltaY :  McTracks[McTracks[{id}].mParentIndex].mPt" select="McTracks[{id}].mParentIndex >= 0 &&  McTracks[McTracks[{id}].mParentIndex].mGeantPID==8 && McTracks[McTracks[{id}].mParentIndex].mParentIndex==-1" /> -->
+		
+		<Draw data="d" name="mtd_{plc}_{state}" draw="MtdPidTraits[Tracks.mMtdPidTraitsIndex].m{state}" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex >= 0 && McTracks[Tracks.mMcIndex].mGeantPID == {plc} && McTracks[Tracks.mMcIndex].mParentIndex == -1 " bins_x="bins.m{state}" />
+
+		<Draw data="d" name="test" draw="Tracks.mMcIndex : MtdPidTraits[{iMtd}].mIdTruth" select="{iMtd}>=0" />
+
+		<Draw data="d" name="t1" draw="Tracks.mMcIndex - (MtdPidTraits[{iMtd}].mIdTruth-1)" select="{iMtd} >= 0" bins_x="bins.index"/>
+
+		<Draw data="d" name="t2" draw="McTracks[Tracks.mMcIndex].mGeantPID" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex>=0 &&  (Tracks.mMcIndex == MtdPidTraits[{iMtd}].mIdTruth-1) " bins_x="bins.mGeantPID"/>
+
+		<Draw data="d" name="t3" draw="McTracks[Tracks.mMcIndex].mGeantPID" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex>=0 &&  (Tracks.mMcIndex != MtdPidTraits[{iMtd}].mIdTruth-1) " bins_x="bins.mGeantPID"/>
+
+		<Draw data="d" name="t4" draw="McTracks[{iTMC}].mGeantPID" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex>=0 &&  (Tracks.mMcIndex != MtdPidTraits[{iMtd}].mIdTruth-1) " bins_x="bins.mGeantPID"/>
+
+		<Draw data="d" name="t5" draw="McTracks[{iTMC}].mGeantPID" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex>=0 && (Tracks.mMcIndex != MtdPidTraits[{iMtd}].mIdTruth-1) && McTracks[{iTMC}].mParentIndex >=0 && McTracks[McTracks[{iTMC}].mParentIndex].mGeantPID ==8" bins_x="bins.mGeantPID"/>
+		
+		<Draw data="d" name="dy0" draw="MtdPidTraits[{iMtd}].mDeltaY" select="Tracks.mMtdPidTraitsIndex>=0" bins_x="bins.mDeltaY" />
+		<Draw data="d" name="dy1" draw="MtdPidTraits[{iMtd}].mDeltaY" select="Tracks.mMtdPidTraitsIndex>=0 && Tracks.mMcIndex >=0 && McTracks[{iMC}].mGeantPID == {plc}" bins_x="bins.mDeltaY" />
+		
+		<Draw data="d" name="dy2" draw="MtdPidTraits[{iMtd}].mDeltaY" select="Tracks.mMtdPidTraitsIndex>=0 && Tracks.mMcIndex >=0 && (Tracks.mMcIndex == MtdPidTraits[{iMtd}].mIdTruth-1) && McTracks[{iMC}].mGeantPID == {plc}" bins_x="bins.mDeltaY" />
+
+		<Draw data="d" name="dy3" draw="MtdPidTraits[{iMtd}].mDeltaY" select="Tracks.mMtdPidTraitsIndex>=0 && Tracks.mMcIndex >=0 && (Tracks.mMcIndex != MtdPidTraits[{iMtd}].mIdTruth-1) && McTracks[{iMC}].mGeantPID == {plc}" bins_x="bins.mDeltaY" />
+
+		<Draw data="d" name="dy4" draw="MtdPidTraits[{iMtd}].mDeltaY" select="Tracks.mMtdPidTraitsIndex>=0 && Tracks.mMcIndex >=0 && (Tracks.mMcIndex != MtdPidTraits[{iMtd}].mIdTruth-1) && McTracks[{iMC}].mGeantPID == {plc} && (McTracks[{iTMC}].mGeantPID == 5 || McTracks[{iTMC}].mGeantPID == 6 )" bins_x="bins.mDeltaY" />
+		
+
+		<!-- <Draw save_as="mtd_{plc}_{state}" data="d" name="mtd_{plc}_{state}" draw="MtdPidTraits[Tracks.mMtdPidTraitsIndex].m{state}" select="Tracks.mMtdPidTraitsIndex >= 0 && Tracks.mMcIndex >= 0 && McTracks[Tracks.mMcIndex].mGeantPID == {plc} && ( (mMtdHitChan/60) < 7.0 || (mMtdHitChan/60) >= 24 || ( (mMtdHitChan/60)>=8.0 && (mMtdHitChan/60)<23.0 ) )" bins_x="bins.m{state}" /> -->
+	</Transform>
+
+	<style>
+		<line optstat="0" linewidth="2" logy="1"/>
+	</style>
+
+
+	<bins>
+		<mGeantPID width="1" min="-1" max="50" />
+		<mParentIndex width="1" min="-1" max="50" />
+		<index width="1" min="-1" max="200" />
+		<mBL width="1" min="0" max="30" />
+		<mStrip width="1" min="0" max="60" />
+		<mCell width="1" min="0" max="12" />
+		<mPt width="0.05" min="0" max="12.0" />
+		<mDeltaY width="0.5" min="-100" max="100" />
+		<mDeltaZ width="0.5" min="-100" max="100" />
+	</bins>
+
+</config>

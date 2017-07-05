@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<GeantNames>
+		<Name></Name>
+		<Name>GAMMA</Name>
+		<Name>POSITRON</Name>
+		<Name>ELECTRON</Name>
+		<Name>NEUTRINO</Name>
+		<Name>MUON +</Name>
+		<Name>MUON -</Name>
+		<Name>PION 0 </Name>
+		<Name>PION +</Name>
+		<Name>PION -</Name>
+		<Name>KAON 0 LONG</Name>
+		<Name>KAON +</Name>
+		<Name>KAON -</Name>
+		<Name>NEUTRON</Name>
+		<Name>PROTON</Name>
+		<Name>ANTIPROTON</Name>
+	</GeantNames>
+
+	<GeantBins type="l">, GAMMA, POSITRON, ELECTRON, NEUTRINO, MUON +, MUON -, PION 0 , PION +, PION -, KAON 0 LONG, KAON +, KAON -, NEUTRON, PROTON, ANTIPROTON, KAON 0 SHORT, ETA, LAMBDA, SIGMA +, SIGMA 0, SIGMA -, XI 0, XI -, OMEGA -, ANTINEUTRON, ANTILAMBDA, ANTISIGMA -, ANTISIGMA 0, ANTISIGMA +, ANTIXI 0, ANTIXI +, ANTIOMEGA +, , , , , , , , , , , , , DEUTERON, TRITON, ALPHA, GEANTINO, HE3, Cerenkov</GeantBins>
+</config>
