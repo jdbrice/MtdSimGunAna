@@ -2,7 +2,7 @@
 <config>
 	<Task name="FemtoDstSkimmer" type="FemtoDstSkimmer" config="" nodePath="FDS" />
 
-	<mod>PID_</mod>
+	<mod>data</mod>
 	<FDS>
 		<EventLoop progress="true" />
 		<input>
@@ -10,36 +10,54 @@
 		</input>
 
 		<output>
-			<TFile url="out/data_SL15c.root" />
+			<TFile url="out/{mod}_{jobIndex}.root" />
 		</output>
 
 		<histograms>
 			<Histo name="Events" title="# of Events" bins_x="bins.n" />
-			<Histo name="McIndex" title="Track Associated McIndex" bins_x="bins.n" />
-			<Histo name="PtResolution" title="Resolution; (p^{RC}_{T} - p^{MC}_{T} ) / p^{MC}_{T}" bins_x="bins.pt_res" />
-			<Histo name="PtResolutionVsPt" title="Resolution; p_{T} (GeV/c); (p^{RC}_{T} - p^{MC}_{T} ) / p^{MC}_{T}" bins_x="bins.pt" bins_y="bins.pt_res" />
+			
+			<Histo prefixes="pos_, neg_" name="mNHitsFit_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="nHitsFit" bins_x="bins.mPt" bins_y="bins.mNHitsFit" />
+			<Histo prefixes="pos_, neg_" name="mEta_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="#eta" bins_x="bins.mPt" bins_y="bins.mEta"/>
+			<Histo prefixes="pos_, neg_" name="mEta_mPhi" titles="Positive Tracks, Negative Tracks" x="#phi (rad)" y="#eta" bins_x="bins.mPhi" bins_y="bins.mEta"/>
+			<Histo prefixes="pos_, neg_" name="mPhi_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="#phi (rad)" bins_x="bins.mPt" bins_y="bins.mPhi"/>
 
-			<Histo name="pip_mDeltaY_mBL" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mBL" />
-			<Histo name="pim_mDeltaY_mBL" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mBL" />
+			<Histo prefixes="pos_, neg_" name="TPC_mEta_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="#eta" bins_x="bins.mPt" bins_y="bins.mEta"/>
+			<Histo prefixes="pos_, neg_" name="TPC_mEta_mPhi" titles="Positive Tracks, Negative Tracks" x="#phi (rad)" y="#eta" bins_x="bins.mPhi" bins_y="bins.mEta"/>
+			<Histo prefixes="pos_, neg_" name="TPC_mPhi_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="#phi (rad)" bins_x="bins.mPt" bins_y="bins.mPhi"/>
 
-			<Histo name="pip_mDeltaY_mCell" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mCell" />
-			<Histo name="pim_mDeltaY_mCell" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mCell" />
+			<Histo prefixes="pos_, neg_" name="mDeltaY_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="MTD DeltaY (cm)" bins_x="bins.mPt" bins_y="bins.mDeltaY"/>
+			<Histo prefixes="pos_, neg_" name="mDeltaZ_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="MTD DeltaZ (cm)" bins_x="bins.mPt" bins_y="bins.mDeltaZ"/>
+			<Histo prefixes="pos_, neg_" name="mMtdMatchFlag_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="MTD MatchFlag" bins_x="bins.mPt" bins_y="bins.mMtdMatchFlag"/>
+			<Histo prefixes="pos_, neg_" name="mCell_mPt" titles="Positive Tracks, Negative Tracks" x="p_{T} (GeV/c)" y="MTD Cell" bins_x="bins.mPt" bins_y="bins.mCell"/>
+			<Histo prefixes="pos_, neg_" name="MtdHitMap" titles="Positive Tracks, Negative Tracks" x="MTD BL" y="MTD Cell (by Mod)" bins_x="bins.mBL" bins_y="bins.mStrip"/>
+			<Histo prefixes="pos_, neg_" name="mBL_mPhi" titles="Positive Tracks, Negative Tracks" x="#phi" y="MTD BL" bins_x="bins.mPhi" bins_y="bins.mBL"/>
 
-			<Histo name="pip_mDeltaY_mMod" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mMod" />
-			<Histo name="pim_mDeltaY_mMod" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" bins_z="bins.mMod" />
 
-			<Histo name="pip_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
-			<Histo name="pim_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+			<Histo prefixes="pos_, neg_" name="mY_mX" titles="Positive Track Decay Vertex, Negative Track Decay Vertex" x="x (cm)" y="y (cm)" bins_x="bins.mX" bins_y="bins.mY" />
+			<Histo prefixes="pos_, neg_" name="mZ_mX" titles="Positive Track Decay Vertex, Negative Track Decay Vertex" x="x (cm)" y="z (cm)" bins_x="bins.mX" bins_y="bins.mZ" />
+			<Histo prefixes="pos_, neg_" name="mY_mZ" titles="Positive Track Decay Vertex, Negative Track Decay Vertex" x="z (cm)" y="y (cm)" bins_x="bins.mZ" bins_y="bins.mY" />
+			<Histo prefixes="pos_, neg_" name="mR_mPt" titles="Positive, Negative" x="p_{T} (GeV/c)" y="Decay Length" bins_x="bins.mPt" bins_y="bins.mR" />
 
-			<Histo name="punch_pip_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
-			<Histo name="punch_pim_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
+			<Histo prefixes="pos_, neg_" name="GeantProcess_mPt" titles="Positive, Negative" x="p_{T} (GeV/c)" y="GEANT Process" bins_x="bins.mPt" bins_y="bins.mProcess" />
 
-			<Histo name="sec_mup_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
-			<Histo name="sec_mum_mDeltaY" title="" bins_x="bins.pt" bins_y="bins.mDeltaY" />
 
-			<Histo name="idTruthVsIndex" title="" bins_x="bins.idTruth" />
 
-			<Histo name="mtdMatchFlag" title="MTD matchFlag" bins_x="bins.mBL" />
+			<!--<Histo name="pos_mDeltaY_mPt_mStrip" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60" title="Positive Tracks" x="p_{T} (GeV/c)" y="MTD DeltaY (cm)" bins_x="bins.mPt" bins_y="bins.mDeltaY"/>-->
+			<!--<Histo name="neg_mDeltaY_mPt_mStrip" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60" title="Negative Tracks" x="p_{T} (GeV/c)" y="MTD DeltaY (cm)" bins_x="bins.mPt" bins_y="bins.mDeltaY"/>-->
+
+			<Histo name="pos_mDeltaY_mPt_mCell" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12" title="Positive Tracks" x="p_{T} (GeV/c)" y="MTD DeltaY (cm)" bins_x="bins.mPt" bins_y="bins.mDeltaY"/>
+			<Histo name="neg_mDeltaY_mPt_mCell" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12" title="Negative Tracks" x="p_{T} (GeV/c)" y="MTD DeltaY (cm)" bins_x="bins.mPt" bins_y="bins.mDeltaY"/>
+
+			<Histo name="pos_mDeltaY_mBL_mCell" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12" title="Positive Tracks" x="MTD BL" y="MTD DeltaY (cm)" bins_x="bins.mBL" bins_y="bins.mDeltaY"/>
+			<Histo name="neg_mDeltaY_mBL_mCell" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12" title="Negative Tracks" x="MTD BL" y="MTD DeltaY (cm)" bins_x="bins.mBL" bins_y="bins.mDeltaY"/>
+
+			<Histo name="pos_mDeltaY_mBL_mStrip" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60" title="Positive Tracks" x="MTD BL" y="MTD DeltaY (cm)" bins_x="bins.mBL" bins_y="bins.mDeltaY"/>
+			<Histo name="neg_mDeltaY_mBL_mStrip" suffixes="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60" title="Negative Tracks" x="MTD BL" y="MTD DeltaY (cm)" bins_x="bins.mBL" bins_y="bins.mDeltaY"/>
+
+
+
+
+
 		</histograms>
 
 	</FDS>
@@ -48,14 +66,41 @@
 	<bins>
 		<GeantBins type="l">, GAMMA, e+, e-, NEUTRINO, mu+, mu-, pi0 , pi+, pi-, KAON 0 LONG, KAON +, KAON -, NEUTRON, PROTON, ANTIPROTON, KAON 0 SHORT, ETA, LAMBDA, SIGMA +, SIGMA 0, SIGMA -, XI 0, XI -, OMEGA -, ANTINEUTRON, ANTILAMBDA, ANTISIGMA -, ANTISIGMA 0, ANTISIGMA +, ANTIXI 0, ANTIXI +, ANTIOMEGA +, , , , , , , , , , , , , DEUTERON, TRITON, ALPHA, GEANTINO, HE3, Cerenkov</GeantBins>
 		<GeantBinsText type="l">, GAMMA, POSITRON, ELECTRON, NEUTRINO, MUON +, MUON -, PION 0 , PION +, PION -, KAON 0 LONG, KAON +, KAON -, NEUTRON, PROTON, ANTIPROTON, KAON 0 SHORT, ETA, LAMBDA, SIGMA +, SIGMA 0, SIGMA -, XI 0, XI -, OMEGA -, ANTINEUTRON, ANTILAMBDA, ANTISIGMA -, ANTISIGMA 0, ANTISIGMA +, ANTIXI 0, ANTIXI +, ANTIOMEGA +, , , , , , , , , , , , , DEUTERON, TRITON, ALPHA, GEANTINO, HE3, Cerenkov</GeantBinsText>
+		
 		<n width="1" min="0" max="100" />
+		
+		<!--VERTEX-->
+		<mX width="0.5" min="-100" max="-100"/>
+		<mY width="0.5" min="-100" max="100" />
+		<mY width="1" min="-500" max="500" />
+		<mR width="1" min="-500" max="500" />
+		<mProcess width="1" min="-50" max="50" />
+		<!--VERTEX-->
+
+		<!--Kinematics-->
+		<mPt width="0.01" min="50" max="55.0" />
+		<mEta width="0.01" min="-0.6" max="0.6"/>
+		<mPhi width="0.01" min="-3.2" max="3.2"/>
+		<!--Kinematics-->
+
+		<!--MTD-->
+		<mBL width="1" min="1" max="31" />
+        <mStrip width="1" min="1" max="61" />
+        <mCell width="1" min="1" max="13" />
+
+        <mDeltaY width="0.5" min="-100" max="100" />
+        <mDeltaZ width="0.5" min="-100" max="100" />
+		<mMtdMatchFlag width="1" min="0" max="15" />
+		<!--MTD-->
+
+		<mNHitsFit width="1" min="0" max="50" />
+
 		<pt_res width="0.001" min="-1" max="1.0" />
 		<pt width="0.05" min="0" max="8" />
-		<mDeltaY width="0.5" min="-65" max="65" />
+
 		<idTruth width="1" min="-100" max="100" />
-		<mBL width="1" min="0" max="31" />
-		<mCell width="1" min="0" max="12" />
-		<mMod width="1" min="0" max="30" />
+		
+		
 	</bins>
 
 </config>

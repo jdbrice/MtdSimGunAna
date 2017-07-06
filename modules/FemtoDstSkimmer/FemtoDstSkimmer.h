@@ -9,6 +9,7 @@
 #include "FemtoDstFormat/FemtoEvent.h"
 #include "FemtoDstFormat/FemtoTrack.h"
 #include "FemtoDstFormat/FemtoMcTrack.h"
+#include "FemtoDstFormat/FemtoMcVertex.h"
 #include "FemtoDstFormat/FemtoTrackHelix.h"
 #include "FemtoDstFormat/FemtoMtdPidTraits.h"
 #include "FemtoDstFormat/FemtoTrackProxy.h"
@@ -80,6 +81,45 @@ public:
 	}
 };
 
+
+class FemtoTracklet {
+	public:
+		FemtoTracklet( ) {
+			mPt = 0;
+			mEta = 0;
+			mPhi = 0;
+		}
+
+		FemtoTracklet( FemtoTrack * t ){
+			mPt  = t->mPt;
+			mEta = t->mEta;
+			mPhi = t->mPhi;
+		}
+		
+		FemtoTracklet( FemtoMcTrack * t ){
+			mPt  = t->mPt;
+			mEta = t->mEta;
+			mPhi = t->mPhi;
+		}
+
+		void set( FemtoMcTrack * t ){
+			mPt  = t->mPt;
+			mEta = t->mEta;
+			mPhi = t->mPhi;
+		}
+		void set( FemtoTrack * t ){
+			mPt  = t->mPt;
+			mEta = t->mEta;
+			mPhi = t->mPhi;
+		}
+
+
+
+	Float_t   mPt;        // primary track px
+	Float_t   mEta;       // primary track py
+	Float_t   mPhi;       // primary track pz
+};
+
 vector<string> PlcNode::GEANTNAMES;
 
 class FemtoDstSkimmer : public TreeAnalyzer
@@ -90,10 +130,13 @@ protected:
 	BranchReader<FemtoEvent> _rEvent;
 	TClonesArrayReader<FemtoTrack> _rTracks;
 	TClonesArrayReader<FemtoMcTrack> _rMcTracks;
+	TClonesArrayReader<FemtoMcVertex> _rMcVertices;
 	TClonesArrayReader<FemtoTrackHelix> _rHelices;
 	TClonesArrayReader<FemtoMtdPidTraits> _rMtdPid;
 
 	vector<PlcNode*> plcTree;
+
+	bool isRealData = false;
 
 public:
 	virtual const char* classname() const {return "FemtoDstSkimmer";}
@@ -106,6 +149,7 @@ public:
 		_rEvent.setup( chain, "Event" );
 		_rTracks.setup( chain, "Tracks" );
 		_rMcTracks.setup( chain, "McTracks" );
+		_rMcVertices.setup( chain, "McVertices" );
 		_rHelices.setup( chain, "Helices" );
 		_rMtdPid.setup( chain, "MtdPidTraits" );
 
@@ -121,7 +165,8 @@ protected:
 		size_t nMcTracks = _rMcTracks.N();
 		plcTree.clear();
 
-		// McTracks are already sorted such that a child never has a smaller index than a parent
+		// Generate the plcNodes linked list
+		// NB. McTracks are already sorted such that a child never has a smaller index than a parent
 		for (size_t i = 0; i < nMcTracks; i++){
 			FemtoMcTrack *mcTrack = _rMcTracks.get( i );
 			PlcNode* plc= new PlcNode();
@@ -136,15 +181,7 @@ protected:
 			plcTree.push_back( plc );
 		}
 
-		// if the McTracks were not ordered we would need this second loop
-		
-		// for (auto plc : plcTree ){
-		// 	if ( plc->_self->mParentIndex >= 0 ){
-		// 		plc->_parent = plcTree[ plc->_self->mParentIndex ];
-		// 		plc->_parent->_children.push_back( plc );
-		// 	}
-		// }
-
+		// Now search for the match states
 		size_t nTracks = _rTracks.N();
 		FemtoTrackProxy _proxy;
 		for (size_t i = 0; i < nTracks; i++ ){
@@ -157,7 +194,6 @@ protected:
 				plcTree[_proxy._mtdPid->mIdTruth]->_mtdTruth = true;
 			}
 		}
-
 
 		// for (auto plc : plcTree ){
 		// 	if ( plc->_parent == nullptr ){
@@ -208,86 +244,118 @@ protected:
 		return "0";
 	}
 
+	virtual void preEventLoop(){
+		TreeAnalyzer::preEventLoop();
+
+		// for ( int iBL = 0; iBL < 30; iBL++ ){
+		// 	for ( int iCell = 0; iCell < 12; iCell++ ){
+		// 		book->clone( "pos_mDeltaY_mPt", "pos_mDeltaY_mPt_mBL"+ts(iBL) +"_mCell" + ts(iCell) );
+		// 	}
+		// }
+
+	}
+
+	virtual void fillHistograms( FemtoTrackProxy &_proxy ){
+		if ( _proxy._track == nullptr ) return;
+		string prefix = "pos_";
+		if ( _proxy._track->charge() < 0 )
+			prefix = "neg_";
+
+		FemtoTracklet tl;
+		if ( nullptr != _proxy._mcTrack )
+			tl.set( _proxy._mcTrack );
+		else 
+			tl.set( _proxy._track );
+
+		if ( tl.mPt <= 0.1 ){
+			// LOG_F( INFO, "what mPt=%f", _proxy._track->mPt );
+			return;
+		}
+
+		if ( _proxy._mcTrack ){
+			
+			FemtoMcVertex *stopVertex = nullptr;
+			if ( _proxy._mcTrack->mStopVertexIndex >= 0 )
+				stopVertex = _rMcVertices.get( _proxy._mcTrack->mStopVertexIndex );
+			FemtoMcVertex *startVertex = nullptr;
+			if ( _proxy._mcTrack->mStartVertexIndex >= 0 )
+				startVertex = _rMcVertices.get( _proxy._mcTrack->mStartVertexIndex );
+			
+			PlcNode *pNode = plcTree[ _proxy._track->mMcIndex ];
+			if ( pNode->_parent == nullptr && pNode->_children.size() == 2 && ( pNode->_children[0]->_self->mGeantPID==5 || pNode->_children[0]->_self->mGeantPID==6 || pNode->_children[1]->_self->mGeantPID==5 || pNode->_children[1]->_self->mGeantPID==6 ) ){
+
+			}
+		}
+
+		// all tracks
+		book->fill( prefix + "TPC_mEta_mPt", tl.mPt, tl.mEta );
+		book->fill( prefix + "TPC_mPhi_mPt", tl.mPt, tl.mPhi );
+		book->fill( prefix + "TPC_mEta_mPhi", tl.mPhi, tl.mEta );
+
+		book->fill( prefix + "mNHitsFit_mPt", tl.mPt, _proxy._track->mNHitsFit );
+
+		if ( fabs(_proxy._track->mNHitsFit) < 15 ) return;
+
+		if ( _proxy._mtdPid ){
+
+			int bl     = _proxy._mtdPid->backleg() + 1;
+			int cell   = _proxy._mtdPid->cell() + 1;
+			int strip  = _proxy._mtdPid->mMtdHitChan - bl * 60 + 1;
+			int module = _proxy._mtdPid->module() + 1;
+
+			if ( bl == 7 || bl == 23 ) {
+				// LOG_F( INFO, "Skipping BL == 7, 23" );
+				return;
+			}
+
+			book->fill( prefix + "mMtdMatchFlag_mPt", tl.mPt, _proxy._mtdPid->mMatchFlag );
+
+			if ( _proxy._mtdPid->mMatchFlag > 1 ) return;
+
+			book->fill( prefix + "mEta_mPt", tl.mPt, tl.mEta );
+			book->fill( prefix + "mPhi_mPt", tl.mPt, tl.mPhi );
+			book->fill( prefix + "mEta_mPhi", tl.mPhi, tl.mEta );
+			book->fill( prefix + "mBL_mPhi", tl.mPhi, bl );
+
+			
+			book->fill( prefix + "MtdHitMap", bl, strip );
+
+			book->fill( prefix + "mDeltaY_mPt", tl.mPt, _proxy._mtdPid->mDeltaY );
+			book->fill( prefix + "mDeltaZ_mPt", tl.mPt, _proxy._mtdPid->mDeltaZ );
+			book->fill( prefix + "mCell_mPt", tl.mPt, cell );
+
+			// book->fill( prefix + "mDeltaY_mPt_mStrip" + ts(strip), tl.mPt, _proxy._mtdPid->mDeltaY );
+			book->fill( prefix + "mDeltaY_mPt_mCell" + ts(cell), tl.mPt, _proxy._mtdPid->mDeltaY );
+
+			// book->fill( prefix + "mDeltaY_mPt_mBL" +ts(bl) + "_mCell" + ts(cell), tl.mPt, _proxy._mtdPid->mDeltaY );
+
+			book->fill( prefix + "mDeltaY_mBL_mCell" + ts(cell), bl, _proxy._mtdPid->mDeltaY );
+			book->fill( prefix + "mDeltaY_mBL_mStrip" + ts(strip), bl, _proxy._mtdPid->mDeltaY );
+
+		
+		}
+
+	}
+
 	virtual void analyzeEvent(){
-	
 		_event = _rEvent.get();
-		makeMcTree();
+		
+		size_t nMcTracks = _rMcTracks.N();
+		if ( nMcTracks > 0 )
+			makeMcTree();
+		else 
+			isRealData = 0;
 		
 		size_t nTracks = _rTracks.N();
 		size_t nMtdPid = _rMtdPid.N();
 		FemtoTrackProxy _proxy;
 		for (size_t i = 0; i < nTracks; i++ ){
 			_proxy.assemble( i, _rTracks, _rHelices, _rMtdPid, _rMcTracks );
-
-			if ( _proxy._mcTrack ){
-				book->fill( "McIndex", _proxy._track->mMcIndex );
-				book->fill( "PtResolution", (_proxy._track->mPt - _proxy._mcTrack->mPt ) / _proxy._mcTrack->mPt   );
-				book->fill( "PtResolutionVsPt", _proxy._mcTrack->mPt, (_proxy._track->mPt - _proxy._mcTrack->mPt ) / _proxy._mcTrack->mPt   );
-			}
-
-			if ( _proxy._mcTrack && _proxy._mtdPid ){
-
-				int bl = _proxy._mtdPid->backleg();
-				int cell = _proxy._mtdPid->cell();
-				int module = _proxy._mtdPid->module();
-
-				if ( bl == 7 || bl == 23 ) {
-					// LOG_F( INFO, "Skipping BL == 7, 23" );
-					continue;
-				}
-
-				book->fill( "mtdMatchFlag", _proxy._mtdPid->mMatchFlag );
-				// if ( _proxy._mtdPid->mMatchFlag != 7 ) {
-				// 	LOG_F( INFO, "Skipping Match Flag 7" );
-				// 	continue;
-				// }
-
-				// LOG_F( INFO, "mGeantPID = %d", _proxy._mcTrack->mGeantPID  );
-
-				if ( 8 == _proxy._mcTrack->mGeantPID ){
-					book->fill( "pip_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-					book->fill( "pip_mDeltaY_mBL", _proxy._track->mPt, _proxy._mtdPid->mDeltaY, bl );
-					book->fill( "pip_mDeltaY_mMod", _proxy._track->mPt, _proxy._mtdPid->mDeltaY, module );
-					book->fill( "pip_mDeltaY_mCell", _proxy._track->mPt, _proxy._mtdPid->mDeltaY, cell );
-				}
-
-				if ( 9 == _proxy._mcTrack->mGeantPID ){
-					LOG_F( INFO, "charge = %d", _proxy._track->charge() );
-					book->fill( "pim_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-					book->fill( "pim_mDeltaY_mBL", _proxy._track->mPt, _proxy._mtdPid->mDeltaY, bl );
-					book->fill( "pim_mDeltaY_mMod", _proxy._track->mPt, _proxy._mtdPid->mDeltaY, module );
-					book->fill( "pim_mDeltaY_mCell", _proxy._track->mPt, _proxy._mtdPid->mDeltaY, cell );
-				}
-
-
-				book->fill("idTruthVsIndex", _proxy._track->mMcIndex - (_proxy._mtdPid->mIdTruth) );
-
-				PlcNode *plcMatch = plcTree[ _proxy._track->mMcIndex ];
-				PlcNode *plcHit   = plcTree[ _proxy._mtdPid->mIdTruth ];
-
-				if ( punch_through( plcHit ) ){
-					book->fill( "punch_pi" + cs(_proxy._track->charge()) + "_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-				} else {
-					book->fill( "sec_mu" + cs(_proxy._track->charge()) + "_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-				}
-
-				// if ( _proxy._track->mMcIndex - (_proxy._mtdPid->mIdTruth-1) == 0 ){
-				// 	if ( 8 == _proxy._mcTrack->mGeantPID )
-				// 		book->fill( "tpip_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-
-				// 	if ( 9 == _proxy._mcTrack->mGeantPID )
-				// 		book->fill( "tpim_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-				// } else {
-				// 	if ( 8 == _proxy._mcTrack->mGeantPID )
-				// 		book->fill( "dpip_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-
-				// 	if ( 9 == _proxy._mcTrack->mGeantPID )
-				// 		book->fill( "dpim_mDeltaY", _proxy._track->mPt, _proxy._mtdPid->mDeltaY );
-				// }
-			}
-
+			fillHistograms( _proxy );
 		}
 	}
+
+
 
 
 	virtual void postEventLoop(){

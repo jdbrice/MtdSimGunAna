@@ -4,10 +4,7 @@ import os
 import platform
 
 SConscript('color_SConscript')
-Import( 'env' )
-
-SConscript('color_SConscript')
-Import( 'env' )
+Import('env')
 
 # env = Environment()
 
