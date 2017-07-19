@@ -5,3 +5,6 @@
 *.lis
 *.root
 *Export
+*.app
+*config_dump.txt
+Plots/*.pdf

@@ -298,12 +298,17 @@ protected:
 
 		if ( _proxy._mtdPid ){
 
-			int bl     = _proxy._mtdPid->backleg() + 1;
-			int cell   = _proxy._mtdPid->cell() + 1;
-			int strip  = _proxy._mtdPid->mMtdHitChan - bl * 60 + 1;
-			int module = _proxy._mtdPid->module() + 1;
+			int bl     = _proxy._mtdPid->backleg();
+			int cell   = _proxy._mtdPid->cell();
+			int strip  = _proxy._mtdPid->mMtdHitChan - (bl * 60);
+			int module = _proxy._mtdPid->module();
 
-			if ( bl == 7 || bl == 23 ) {
+			bl     += 1;
+			cell   += 1;
+			strip  += 1;
+			module += 1;
+
+			if ( bl == 8 || bl == 24 ) {
 				// LOG_F( INFO, "Skipping BL == 7, 23" );
 				return;
 			}
@@ -331,6 +336,7 @@ protected:
 
 			book->fill( prefix + "mDeltaY_mBL_mCell" + ts(cell), bl, _proxy._mtdPid->mDeltaY );
 			book->fill( prefix + "mDeltaY_mBL_mStrip" + ts(strip), bl, _proxy._mtdPid->mDeltaY );
+			book->fill( "mDeltaY_mBL_mStrip" + ts(strip), bl, _proxy._mtdPid->mDeltaY );
 
 		
 		}
